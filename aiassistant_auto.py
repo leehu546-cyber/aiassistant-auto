@@ -31,13 +31,15 @@ def log(msg: str) -> None:
 
 def is_aiassistant_window(title: str) -> bool:
     t = title.strip().lower().replace(" ", "")
+    # 排除快捷方式启动的控制台窗口（标题含"换号"）
+    if "换号" in t:
+        return False
     return any(k.lower().replace(" ", "") in t or t in k.lower().replace(" ", "") for k in WINDOW_TITLE_KEYS)
 
 
 def get_main_window():
     desktop = Desktop(backend="uia")
-    best = None
-    best_area = -1
+    candidates = []
     for w in desktop.windows():
         try:
             title = w.window_text()
@@ -52,14 +54,24 @@ def get_main_window():
             if r.width() <= 100 or r.height() <= 100:
                 continue
             area = r.width() * r.height()
-            if area > best_area:
-                best_area = area
-                best = w
+            candidates.append((area, w))
         except Exception:
             continue
-    if best is None:
+    if not candidates:
         raise RuntimeError("未找到 AIassistant / AI助手 窗口，请先打开")
-    return desktop.window(handle=best.handle)
+    # 按面积降序排列，优先选择包含侧边栏按钮的窗口
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    sidebar_keywords = {"Cursor", "首页", "充值续费", "使用教程"}
+    for area, candidate in candidates:
+        try:
+            win = desktop.window(handle=candidate.handle)
+            for btn in win.descendants(control_type="Button"):
+                if btn.window_text().strip() in sidebar_keywords:
+                    return win
+        except Exception:
+            continue
+    # 兜底：返回面积最大的
+    return desktop.window(handle=candidates[0][1].handle)
 
 
 SIDEBAR_ITEMS = {"首页", "Cursor", "充值续费", "使用教程"}
@@ -206,16 +218,40 @@ def bring_to_front() -> None:
 
 
 def ensure_visible() -> None:
-    """若窗口最小化则恢复。"""
+    """若窗口最小化则恢复。若窗口在屏幕外则移回屏幕中央。"""
     import win32con
     import win32gui
+    import win32api
 
     win = get_main_window()
     hwnd = win.handle
     if win32gui.IsIconic(hwnd):
         log("窗口已最小化，正在恢复...")
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-        time.sleep(0.5)
+        time.sleep(1.5)
+    # 检查窗口是否在屏幕外，移回屏幕中央
+    try:
+        r = win.rectangle()
+        sw = win32api.GetSystemMetrics(0)
+        sh = win32api.GetSystemMetrics(1)
+        margin = 200
+        is_offscreen = (
+            r.left + r.width() < -margin
+            or r.top + r.height() < -margin
+            or r.left > sw + margin
+            or r.top > sh + margin
+        )
+        if is_offscreen:
+            log("窗口在屏幕外，移回屏幕中央...")
+            new_left = max(0, (sw - r.width()) // 2)
+            new_top = max(0, (sh - r.height()) // 2)
+            win32gui.SetWindowPos(
+                hwnd, 0, new_left, new_top, 0, 0,
+                win32con.SWP_NOSIZE | win32con.SWP_SHOWWINDOW,
+            )
+            time.sleep(0.5)
+    except Exception:
+        pass
 
 
 def minimize_window() -> bool:
@@ -298,7 +334,10 @@ def click_ok_only(minimize: bool = False) -> bool:
 
 
 def safe_repr(text: str) -> str:
-    return text.encode("utf-8", "replace").decode("utf-8")
+    try:
+        return text.encode("utf-8", "replace").decode("utf-8")
+    except Exception:
+        return text.encode("gbk", "replace").decode("gbk", "replace")
 
 
 def list_buttons() -> None:
