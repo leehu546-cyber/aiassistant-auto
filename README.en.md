@@ -1,6 +1,6 @@
-# AIassistant Auto
+﻿# AIassistant Auto
 
-**Language / 语言:** **[English](README.en.md)** | [简体中文](README.zh-CN.md)
+**Language / 璇█:** **[English](README.en.md)** | [绠€浣撲腑鏂嘳(README.zh-CN.md)
 
 Automates Cursor account rotation inside **AIassistant** on Windows.
 
@@ -20,7 +20,7 @@ Automates Cursor account rotation inside **AIassistant** on Windows.
 
 - Windows 10/11
 - Python 3.10+
-- AIassistant running (window title: `AI助手`, `AIassistant`, or `AI Assistant`)
+- AIassistant running (window title: `AI鍔╂墜`, `AIassistant`, or `AI Assistant`)
 
 ## Install
 
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 python aiassistant_auto.py
 ```
 
-Takes about **1–2 minutes** (includes 60s wait after Yes).
+Takes about **1鈥? minutes** (includes 60s wait after Yes).
 
 ### Partial runs
 
@@ -74,9 +74,20 @@ OK_POLL_TIMEOUT = 120     # Max seconds to wait for OK dialog
 |-------|-----|
 | Window not found | Open AIassistant first |
 | Yes/OK not found | Cursor may cover the dialog; try `--ok` |
-| Cooldown timer | Script waits up to 90s for «Xs remaining» |
+| Cooldown timer | Script waits up to 90s for 芦Xs remaining禄 |
 | Cursor steals focus | Script raises AIassistant before clicking OK |
 
+
+## Changelog
+
+### 2026-07-03 — Robustness improvements
+
+- **Fixed window selection picking the console window**: The shortcut-launched console window (title containing "换号") is no longer mistaken for the real AIAssistant window.
+- **Content-based validation**: After filtering by size, the script now verifies the candidate window has sidebar buttons (Cursor / Home / etc.) before selecting it.
+- **Auto-recenter off-screen windows**: If the AIAssistant window is dragged off-screen, the script will move it back to the center of the primary monitor.
+- **Increased UIA tree rebuild delay**: After restoring from minimized state, wait time increased from 0.5s to 1.5s.
+- **Fixed --scan mode Unicode crash**: safe_repr now falls back gracefully when stdout encoding (GBK) can't handle certain characters.
 ## License
 
 MIT
+

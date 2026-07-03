@@ -1,10 +1,9 @@
-# AIassistant Auto · Cursor 换号自动化
-
-**Language / 语言:** **[English](README.en.md)** | **[简体中文](README.zh-CN.md)**
+﻿# AIassistant Auto 路 Cursor 鎹㈠彿鑷姩鍖?
+**Language / 璇█:** **[English](README.en.md)** | **[绠€浣撲腑鏂嘳(README.zh-CN.md)**
 
 ---
 
-Windows desktop automation for **AIassistant** (AI助手): one-click Cursor account rotation.
+Windows desktop automation for **AIassistant** (AI鍔╂墜): one-click Cursor account rotation.
 
 | | |
 |---|---|
@@ -23,11 +22,12 @@ python aiassistant_auto.py
 
 | Command | Description |
 |---------|-------------|
-| `python aiassistant_auto.py` | Full flow (~1–2 min) |
+| `python aiassistant_auto.py` | Full flow (~1鈥? min) |
 | `python aiassistant_auto.py --yes` | Click **Yes** only |
 | `python aiassistant_auto.py --ok` | Click **OK** and minimize |
 | `python aiassistant_auto.py --scan` | List UI buttons (debug) |
 
 ---
 
-📖 **Full documentation:** [English](README.en.md) · [简体中文](README.zh-CN.md)
+馃摉 **Full documentation:** [English](README.en.md) 路 [绠€浣撲腑鏂嘳(README.zh-CN.md)
+
